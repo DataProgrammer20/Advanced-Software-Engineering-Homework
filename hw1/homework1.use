@@ -1,0 +1,82 @@
+model Homework1
+
+--class MallordDuck
+ --attributes
+ --operations
+  --quack()
+  --fly()
+--end
+
+class Driver
+ attributes
+  duck: Duck
+ operations
+  quack()
+   begin
+    self.duck.quack();
+   end
+  fly()
+   begin
+    self.duck.fly();
+   end
+end
+
+class WildTurkey < Turkey
+ attributes
+ operations
+  gobble()
+   begin
+   end
+  fly()
+   begin
+   end
+end
+
+class TurkeyAdapter < Duck
+ attributes
+  turkey: Turkey
+ operations
+  quack()
+   begin
+    self.turkey.gobble();
+   end
+  fly()
+   begin
+    self.turkey.fly();
+   end
+end
+
+abstract class Duck
+ attributes
+ operations
+  quack()
+   begin
+   end
+  fly()
+   begin
+   end
+end
+
+abstract class Turkey
+ attributes
+ operations
+  gobble()
+   begin
+   end
+  fly()
+   begin
+   end
+end
+
+association uses between
+ TurkeyAdapter[0] role adapter
+ Turkey[1] role adaptee
+end
+
+association behave between
+ Driver[0] role target
+ Duck[1] role behaves
+end
+
+
+  
