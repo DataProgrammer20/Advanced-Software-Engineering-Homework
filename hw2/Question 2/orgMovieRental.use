@@ -1,11 +1,12 @@
---Question 2
+-- Original movie USE file
+-- Question 2
 
 model MovieRental
 
 enum PriceCode {regular, family, newRelease}
 
---classes
-
+-- classes
+-- Customer class
 class Customer
 attributes
   name:String
@@ -59,6 +60,7 @@ Statement()
   end
 end
 
+-- Rental class
 class Rental 
   attributes
   daysRented:Integer
@@ -73,6 +75,7 @@ getMovie(): Movie
   end
 end
 
+-- Movie class
 class Movie
 attributes
   title:String
@@ -116,6 +119,7 @@ association customerCharges between
   Charge [0..*] role charges
 end
 
+-- OCL constraints
 constraints
 context Customer
   -- part b

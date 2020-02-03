@@ -1,5 +1,8 @@
+-- Question 2
+
 model Company
 
+-- Person class
 class Person
 attributes
   name: String
@@ -11,6 +14,7 @@ operations
    end
 end
 
+-- Company class
 class Company
 attributes
   name: String
@@ -29,6 +33,7 @@ association WorksFor between
   Person [*] role employee
 end
 
+-- OCL constraints
 constraints
 context Company::hire(p: Person)
   pre: employee->excludes(p)

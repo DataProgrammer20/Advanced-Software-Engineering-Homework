@@ -4,8 +4,9 @@
 model MovieRental
 
 enum PriceCode {regular, family, newRelease}
--- classes
 
+-- classes
+-- Customer class
 class Customer
 attributes
   name:String
@@ -44,6 +45,7 @@ operations
     end
 end
 
+-- Rental class
 class Rental 
 attributes
   daysRented:Integer
@@ -82,6 +84,7 @@ operations
     end
 end
 
+-- Movie class
 class Movie
 attributes
   title:String
@@ -101,6 +104,7 @@ getTitle():String
   end
 end
 
+-- Charge class
 class Charge
 attributes
   chVal:Real
@@ -124,15 +128,3 @@ association customerCharges between
   Customer [1] role cust
   Charge [0..*] role charges
 end
-
---constraints
-
---constraints
---Example constraints
---You may remove these constraints in your design. They are here just as examples.
-
---context Customer
-  --inv maxRental:numRen <= 10
-  --inv agreement:rentals->size = numRen
-  --inv rentals:rentals->notEmpty
-  --inv daysRented:rentals->select(daysRented > 3)->notEmpty
