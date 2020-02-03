@@ -1,0 +1,40 @@
+model Company
+
+class Person
+attributes
+  name: String
+  age: Integer
+  salary: Real
+operations
+  raiseSalary(rate: Real): Real
+   begin
+   end
+end
+
+class Company
+attributes
+  name: String
+  location: String
+operations
+  hire(p: Person)
+   begin
+   end
+  fire(p: Person)
+   begin
+   end
+end
+
+association WorksFor between
+  Company [0..1] role employer
+  Person [*] role employee
+end
+
+constraints
+context Company::hire(p: Person)
+  pre: employee->excludes(p)
+  post: employee->includes(p)
+context Company::fire(p: Person)
+  pre: employee->includes(p)
+  post: employee->excludes(p)
+context Person::raiseSalary(rate: Real): Real
+  post: rate < salary
