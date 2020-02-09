@@ -1,4 +1,3 @@
--- Create and assign attributes
 !create employee: Person
 !set employee.name := 'John'
 !set employee.age := 32
@@ -7,7 +6,6 @@
 !set company.name := 'Figure'
 !set company.location := 'Bozeman'
 
--- Insert company and employee
 !insert(company, employee) into WorksFor
 
 !set employee.salary := 30000.0

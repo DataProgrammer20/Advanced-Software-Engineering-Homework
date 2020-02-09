@@ -1,0 +1,277 @@
+model Homework3
+
+-- Create enum classes for data types
+enum GunType { Rifle, SubMachineGun, MachineGun, SniperRifle, HandGun }
+enum FireMode { FullAuto, SemiAuto, BoltAction }
+
+-- Create weapon interface
+abstract class Weapon
+attributes
+operations
+ attack()
+  begin
+  end  
+ reload()
+  begin
+  end
+ aim()
+  begin
+  end
+end
+
+-- Create Gun interface
+abstract class Gun < Weapon
+attributes
+ type: GunType
+ ROF: Integer
+ fireMode: FireMode
+ effectiveDistance: Integer
+ damage: Integer
+ magazineCapacity: Integer
+operations
+end
+
+-- Creating concrete AK47 class
+class AK47 < Gun
+attributes
+-- attributes received from superclass
+operations
+ attack()
+  begin
+   WriteLine('Bang, Bang, Bang!');
+  end
+ reload()
+  begin
+   WriteLine('Reloading AK47!');
+  end
+ aim()
+  begin
+   WriteLine('Aiming AK47...');
+  end
+end
+
+-- Creating concrete m1911 class
+class m1911 < Gun
+attributes
+ -- attributes received from superclass
+operations
+ attack()
+  begin
+   WriteLine('Pop, Pop, Pop!');
+  end
+ reload()
+  begin
+   WriteLine('Reloading m1911!');
+  end
+ aim()
+  begin
+   WriteLine('Aiming m1911');
+  end
+end
+
+-- Below is the implementation of the state pattern
+-- State interface
+abstract class State
+attributes
+operations
+ seeOpponentDefeatable()
+  begin
+  end
+ seeOpponentUndefeatable()
+  begin
+  end
+ lostOpponent()
+  begin
+  end
+ receiveBlow()
+  begin
+  end
+end
+
+-- Neutral state
+class Neutral < State
+attributes
+ player: Player
+operations
+ seeOpponentDefeatable()
+  begin
+   WriteLine('Enemy spotted!');
+   -- self.player.state := create: Attack; assign new state
+   self.player.aim();
+   self.player.attack();
+  end
+ seeOpponentUndefeatable()
+  begin
+   WriteLine('Enemy spotted!');
+   WriteLine('Retreat! Retreat to a safer position!');
+   -- player.state := create : Panic assign new state
+  end
+ lostOpponent()
+  begin
+   WriteLine('No enemy targets in the AO!');
+  end
+ receiveBlow()
+  begin
+   WriteLine('There is nothing attacking me!');
+  end
+end
+
+-- Attack state
+class Attack < State
+attributes
+ player: Player
+operations
+ seeOpponentDefeatable()
+  begin
+   WriteLine('Enemy has already been spotted!');
+  end
+ seeOpponentUndefeatable()
+  begin
+   WriteLine('Nothing I cannot take care of!');
+  end
+ lostOpponent()
+  begin
+   WriteLine('I lost visual on the enemy target!');
+   -- player.state := create :Neutral
+  end
+ receiveBlow()
+  begin
+   WriteLine('I have been hit!');
+   self.player.takeDamage(25);
+   if (self.player.health <= 0) then
+    -- self.player.state := create : Die
+   end
+  end
+end
+
+-- Panic state
+class Panic < State
+attributes
+ player: Player
+operations
+ seeOpponentDefeatable()
+  begin
+   WriteLine('Enemy has already been spotted!');
+  end
+ seeOpponentUndefeatable()
+  begin
+   WriteLine('I am unsure about this!');
+  end
+ lostOpponent()
+  begin
+   WriteLine('I lost visual on the enemy target!');
+   -- self.player.state := create : Neutral
+  end
+ receiveBlow()
+  begin
+   WriteLine('I have been hit!');
+   self.player.takeDamage(25);
+   if (self.player.health <= 0) then
+    -- self.player.state := create : Die
+   end
+  end
+end
+
+-- Die state
+class Die < State
+attributes
+operations
+ seeOpponentDefeatable()
+  begin
+   WriteLine('I am down! Need a medic!');
+  end
+ seeOpponentUndefeatable()
+  begin
+   WriteLine('I am down! Need a medic!');
+  end
+ lostOpponent()
+  begin
+   WriteLine('I am down! Need a medic!');
+  end
+ receiveBlow()
+  begin
+   WriteLine('I am down! Need a medic!');
+  end
+end
+
+-- Player class
+class Player
+attributes
+ health: Integer
+ name: String
+ level: Integer
+ primaryWeapon: Weapon
+ secondaryWeapon: Weapon
+ equippedWeapon: Weapon
+ state: State
+operations
+ seeOpponentDefeatable()
+  begin
+   self.state.seeOpponentDefeatable();
+  end
+ seeOpponentUndefeatable()
+  begin
+   self.state.seeOpponentUndefeatable();
+  end
+ lostOpponent()
+  begin
+   self.state.lostOpponent();
+  end
+ receiveBlow()
+  begin
+   self.state.receiveBlow();
+   -- if (state = Die) then
+   --  WriteLine('==== You Have Been Eliminated ====');
+   -- end
+  end
+ -- Game play functions
+ attack()
+  begin
+   self.equippedWeapon.attack();
+  end
+ reload()
+  begin
+   self.equippedWeapon.reload();
+  end
+ aim()
+  begin
+   self.equippedWeapon.aim();
+  end
+ levelUp()
+  begin
+   self.level := self.level + 1
+  end
+ switchWeapons()
+  begin
+   if (self.equippedWeapon = self.primaryWeapon) then
+    self.equippedWeapon := self.secondaryWeapon;
+   else
+    self.equippedWeapon := self.primaryWeapon;
+   end
+  end
+ gainHealth(heal: Integer)
+  begin
+   self.health := self.health + heal;
+  end
+ takeDamage(damage: Integer)
+  begin
+   self.health := self.health - damage;
+  end
+ respawn()
+  begin
+   -- self.state := create : Neutral
+   self.health := 100;
+   WriteLine('Respawning...');
+  end  
+end
+
+-- Associations
+association belongs between
+ Weapon[1] role belongsToPlayer
+ Player[1..2] role weapons
+end
+
+association sharedState between
+ State[1] role hasPlayer
+ Player[1] role hasState
+end
