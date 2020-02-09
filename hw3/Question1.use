@@ -1,3 +1,5 @@
+-- Homework3
+-- Authors: William Kingsley, Yalan Yin
 model Homework3
 
 -- Create enum classes for data types
@@ -36,6 +38,15 @@ class AK47 < Gun
 attributes
 -- attributes received from superclass
 operations
+ init()  -- Used for initializing inherited attributes
+  begin
+   self.type := GunType::Rifle;
+   self.ROF := 200;
+   self.fireMode := FireMode::FullAuto;
+   self.effectiveDistance := 200;
+   self.damage := 35;
+   self.magazineCapacity := 30;
+  end
  attack()
   begin
    WriteLine('Bang, Bang, Bang!');
@@ -55,6 +66,15 @@ class m1911 < Gun
 attributes
  -- attributes received from superclass
 operations
+ init() -- Used for initializing inherited attributes
+  begin
+   self.type := GunType::HandGun;
+   self.ROF := 250;
+   self.fireMode := FireMode::SemiAuto;
+   self.effectiveDistance := 100;
+   self.damage := 25;
+   self.magazineCapacity := 8;
+  end
  attack()
   begin
    WriteLine('Pop, Pop, Pop!');
@@ -197,9 +217,9 @@ end
 -- Player class
 class Player
 attributes
- health: Integer
- name: String
- level: Integer
+ health: Integer init : 100
+ name: String init : 'xXNoob DestroyerXx'
+ level: Integer init : 10
  primaryWeapon: Weapon
  secondaryWeapon: Weapon
  equippedWeapon: Weapon
@@ -264,6 +284,9 @@ operations
    WriteLine('Respawning...');
   end  
 end
+
+-- State machine
+
 
 -- Associations
 association belongs between

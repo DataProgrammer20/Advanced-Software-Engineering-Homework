@@ -1,0 +1,366 @@
+ model CoffeeDispenser
+ 
+ 
+/*
+  * The State pattern interface.
+  */
+ 
+abstract class CoffeeState
+  
+operations
+   
+accept(i:Integer)
+   
+begin
+   
+end
+   
+   
+brew()
+   
+begin
+   
+end
+   
+   
+reset()
+  
+ begin
+   
+end
+ 
+end
+
+ 
+
+class noCoins < CoffeeState
+   
+operations
+    
+accept(i:Integer)
+    
+begin
+	   
+declare dollars:Integer;
+           
+WriteLine('In state:noCoins operation:accept:');
+	   
+self.coffeeDispenser.amount := self.coffeeDispenser.amount + i;
+	   
+dollars := self.coffeeDispenser.amount;
+	   
+	   
+if (dollars > 0 and dollars < 100) then
+	     
+self.coffeeDispenser.coffeeState := self.coffeeDispenser.hasCoinsState
+	   
+end;
+	   
+	   
+if dollars > 100 then
+	     
+self.coffeeDispenser.coffeeState := self.coffeeDispenser.enoughCoinsState
+	   
+end;
+    
+end
+
+    
+brew()
+    
+begin 
+	 
+ WriteLine('In state:noCoins operation:brew YOU MUST INSERT MONEY BEFORE YOU BREW');
+    
+end
+
+    
+reset()
+    
+begin
+	  
+WriteLine('In state:noCoins operation:reset');
+	  
+self.coffeeDispenser.amount := 0;
+    
+end
+ 
+end
+
+ 
+
+class hasCoins < CoffeeState
+   
+operations
+   accept(i:Integer)
+   
+begin
+          
+declare dollars:Integer;
+          
+WriteLine('In state:hasCoins operation:accept:');
+	  
+self.coffeeDispenser.amount := self.coffeeDispenser.amount + i;
+	  
+dollars := self.coffeeDispenser.amount;
+	  
+	  
+if (dollars > 100) then
+	     
+self.coffeeDispenser.coffeeState := self.coffeeDispenser.enoughCoinsState
+	  
+end;
+   
+end
+   
+   
+brew()
+   
+begin
+     
+WriteLine('In state:hasCoins operation:brew YOU NEED TO ADD MORE MONEY');
+   
+end
+   
+   
+reset()
+   
+begin
+         
+WriteLine('In state:hasCoins operation:reset HERE ARE YOUR COINS');
+	 
+self.coffeeDispenser.amount := 0;
+	 
+self.coffeeDispenser.coffeeState := self.coffeeDispenser.noCoinsState;
+   
+end
+ 
+end
+
+ 
+
+class enoughCoins < CoffeeState
+   
+operations
+   
+accept(i:Integer)
+   
+begin
+      
+WriteLine('In state:enoughCoins operation:accept:');
+      
+self.coffeeDispenser.amount := self.coffeeDispenser.amount + i;
+   
+end
+   
+   
+brew()
+   
+begin
+     
+WriteLine('In state:enoughCoins operation:brew HERE IS YOUR COFFEE AND YOUR CHANGE (IF ANY)');
+     
+self.coffeeDispenser.amount := 0;
+     
+self.coffeeDispenser.coffeeState := self.coffeeDispenser.noCoinsState;
+   
+end
+   
+   
+reset()
+   
+begin
+     
+WriteLine('In state:enoughCoins operation:reset HERE IS YOUR MONEY (IF ANY)');
+     
+self.coffeeDispenser.amount := 0;
+     
+self.coffeeDispenser.coffeeState := self.coffeeDispenser.noCoinsState;
+   
+end
+ 
+end
+
+ 
+
+/*
+  * A simple class for a coffee dispenser.
+  */
+ 
+class CoffeeDispenser
+   
+attributes
+     
+amount : Integer init : 0
+     
+coffeeState : CoffeeState
+     
+noCoinsState : CoffeeState
+     
+hasCoinsState : CoffeeState
+     
+enoughCoinsState : CoffeeState
+     
+   
+operations
+     
+/* create a new coffee dispenser */
+     
+initInstance()
+     
+begin
+           
+self.amount := 0;
+	   
+self.noCoinsState := new noCoins;
+	   
+self.hasCoinsState := new hasCoins;
+	   
+self.enoughCoinsState := new enoughCoins;
+	   
+           
+self.coffeeState := self.noCoinsState; 
+-- we start in the noCoins state
+     
+end
+
+     
+/* A coin is inserted into the dispenser. Valid coins are: 10,20,50,100 and 200. */
+     
+/* We delegate calls to the State pattern interface */
+	 
+     
+accept(i:Integer)
+     
+begin
+       
+self.coffeeState.accept(i);
+     
+end
+     
+pre: let validCoins = Set{10,20,50,100,200} in validCoins->includes(i)
+     
+     
+brew()
+     
+begin
+       
+self.coffeeState.brew();
+     
+end
+     
+     
+reset()
+     
+begin
+	   
+self.coffeeState.reset();
+     
+end
+	 
+   
+statemachines
+     
+psm StatePattern
+	   
+states
+	     
+startUp:initial
+		 
+noCoins       
+[coffeeState = noCoinsState]
+		 
+hasCoins      
+[coffeeState = hasCoinsState]
+		 
+enoughCoins   [coffeeState = enoughCoinsState]
+	   
+transitions
+	     startUp -> noCoins {create}
+		 
+noCoins -> hasCoins { [i > 0 and coffeeState = noCoinsState] accept() }
+		 
+noCoins -> enoughCoins { [i >= 100 and coffeeState = noCoinsState] accept() }
+		 
+noCoins -> noCoins { [coffeeState = noCoinsState] reset() }
+		 
+noCoins -> noCoins { [coffeeState = noCoinsState] brew() }
+		 
+hasCoins -> noCoins { [coffeeState = hasCoinsState] reset() }
+		 
+hasCoins -> enoughCoins { [i + amount >= 100 and coffeeState = hasCoinsState] accept() }
+		 
+hasCoins -> hasCoins { [i + amount < 100 and coffeeState = hasCoinsState] accept() }
+		
+ hasCoins -> noCoins { [coffeeState = hasCoinsState] brew() }
+		 
+enoughCoins -> noCoins { [coffeeState = enoughCoinsState] brew() }
+		 
+enoughCoins -> enoughCoins { [coffeeState = enoughCoinsState] accept() }
+		
+ enoughCoins -> noCoins { [coffeeState = enoughCoinsState] reset() }
+	 
+end
+   
+     
+psm Usage
+       
+states
+         
+-- The start node
+        
+ startUp:initial
+        
+ -- The initial state after creation.
+         
+noCoins      [amount = 0]
+         
+-- Some coins were inserted, but not enough.
+         
+hasCoins     [amount > 0 and amount < 100]
+         
+-- Enough coins, ready to brew.
+         
+enoughCoins  [amount >= 100]
+       transitions
+        
+ -- Define the first state after creation.
+         
+startUp  -> noCoins     { create }
+         
+-- A coin was inserted, but it wasn't enough.
+         
+noCoins  -> hasCoins    { [i > 0] accept() [amount < 100] }
+         
+-- Enough money was inserted.
+        
+noCoins  -> enoughCoins { [i > 0] accept() [amount >= 100] }
+         
+-- Abort
+         hasCoins -> noCoins     { reset()  }
+         
+-- Enough money was inserted.
+         
+hasCoins -> enoughCoins { [i + amount >= 100] accept() }
+         
+-- Another coin was inserted, but it wasn't enough.
+         
+hasCoins -> hasCoins    { [i + amount < 100] accept() }
+         
+-- Abort
+         enoughCoins -> noCoins  { reset()  }
+         
+-- Brew coffe, no change ;-)
+        
+ enoughCoins -> noCoins  { brew()   }
+     
+end
+ 
+end
+
+-- associations
+association dispenserState between
+ CoffeeState[1]
+ CoffeeDispenser[1]
+
+end
